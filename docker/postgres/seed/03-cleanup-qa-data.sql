@@ -1,0 +1,27 @@
+-- Removes only QA seed rows created by 02-seed-qa-data.sql.
+
+BEGIN;
+
+DELETE FROM tracking.auditoria_pick WHERE id_auditoria = '00000000-0000-0000-0000-000000119001';
+DELETE FROM tracking.rutas_pick WHERE id_ruta = '00000000-0000-0000-0000-000000109001';
+DELETE FROM tracking.detalle_pick WHERE id_detalle IN (
+    '00000000-0000-0000-0000-000000099001',
+    '00000000-0000-0000-0000-000000099002',
+    '00000000-0000-0000-0000-000000099003'
+);
+DELETE FROM tracking.orden_pick WHERE id_orden = '00000000-0000-0000-0000-000000089001';
+
+DELETE FROM inventory.kardex WHERE id_kardex BETWEEN '00000000-0000-0000-0000-000000079001' AND '00000000-0000-0000-0000-000000079022';
+DELETE FROM inventory.movimiento WHERE id_movimiento BETWEEN '00000000-0000-0000-0000-000000069001' AND '00000000-0000-0000-0000-000000069022';
+DELETE FROM inventory.lote WHERE id_lote BETWEEN '00000000-0000-0000-0000-000000059001' AND '00000000-0000-0000-0000-000000059022';
+DELETE FROM inventory.producto WHERE id_producto BETWEEN '00000000-0000-0000-0000-000000049001' AND '00000000-0000-0000-0000-000000049022';
+DELETE FROM inventory.locacion WHERE id_locacion BETWEEN '00000000-0000-0000-0000-000000039001' AND '00000000-0000-0000-0000-000000039009';
+DELETE FROM inventory.almacen WHERE id_almacen IN (9101, 9102, 9103, 9201);
+-- Brands/categories may have existed before the seed, so cleanup does not remove them.
+
+DELETE FROM administration.usuario_rol WHERE id_usuario IN (9001, 9002, 9003) OR id_rol IN (9001, 9002);
+DELETE FROM administration.cuenta_usuario WHERE id_cuenta IN (9001, 9002, 9003);
+DELETE FROM administration.usuario WHERE id_usuario IN (9001, 9002, 9003);
+DELETE FROM administration.rol WHERE id_rol IN (9001, 9002);
+
+COMMIT;

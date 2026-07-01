@@ -21,6 +21,8 @@ public class LocationWebMapper {
                 .estante(request.estante())
                 .codBarras(request.codBarras())
                 .capacidad(request.capacidad())
+                .posX(request.posX())
+                .posY(request.posY())
                 .activo(true)
                 .build();
     }
@@ -32,6 +34,8 @@ public class LocationWebMapper {
                 .pasillo(request.pasillo())
                 .estante(request.estante())
                 .capacidad(request.capacidad())
+                .posX(request.posX())
+                .posY(request.posY())
                 .build();
     }
 
@@ -45,6 +49,8 @@ public class LocationWebMapper {
                 location.estante(),
                 location.codBarras(),
                 location.capacidad(),
+                location.posX(),
+                location.posY(),
                 location.activo()
         );
     }

@@ -2,7 +2,6 @@ package com.portable.microservices.ms_tracking.picking.domain.model;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

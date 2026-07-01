@@ -18,6 +18,8 @@ public class LocationPersistenceMapper {
                 .estante(entity.getEstante())
                 .codBarras(entity.getCodBarras())
                 .capacidad(entity.getCapacidad())
+                .posX(entity.getPosX())
+                .posY(entity.getPosY())
                 .activo(entity.getActivo())
                 .build();
     }
@@ -32,6 +34,8 @@ public class LocationPersistenceMapper {
         entity.setEstante(domain.estante());
         entity.setCodBarras(domain.codBarras());
         entity.setCapacidad(domain.capacidad());
+        entity.setPosX(domain.posX());
+        entity.setPosY(domain.posY());
         entity.setActivo(domain.activo());
         return entity;
     }

@@ -6,5 +6,8 @@ import java.util.UUID;
 
 public record RutaResponse(
         List<UUID> pathSeq,
-        BigDecimal distanciaEstimada
+        List<RutaNodeResponse> nodes,
+        List<UUID> pickingStops,
+        BigDecimal distanciaEstimada,
+        List<DetallePickResponse> detalles
 ) {}

@@ -33,7 +33,7 @@ public class DijkstraService {
         Map<UUID, UUID> predecesores = new HashMap<>();
         Set<UUID> visitados = new HashSet<>();
         for (var nodo : grafo.nodos()) {
-            distancias.put(nodo.idNodo(), BigDecimal.valueOf(Double.POSITIVE_INFINITY));
+            distancias.put(nodo.idNodo(), BigDecimal.valueOf(Double.MAX_VALUE));
         }
         distancias.put(nodoInicio, BigDecimal.ZERO);
         PriorityQueue<UUID> pq = new PriorityQueue<>(

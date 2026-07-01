@@ -10,6 +10,7 @@ import com.portable.microservices.ms_tracking.picking.domain.model.OrdenPick;
 public interface OrdenPickPersistencePortOut {
     OrdenPick save(OrdenPick orden);
     Optional<OrdenPick> findById(UUID idOrden);
+    Optional<OrdenPick> findByDocRef(String docRef);
     List<OrdenPick> findAll();
     List<OrdenPick> findByEstado(String estado);
     DetallePick save(DetallePick detalle);

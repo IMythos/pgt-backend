@@ -14,6 +14,8 @@ public record CreateLocationRequest(
     @NotBlank(message = "El código de barras es obligatorio")
     String codBarras,
 
-    Integer capacidad
+    Integer capacidad,
+    Integer posX,
+    Integer posY
 ) {
 }

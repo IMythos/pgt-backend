@@ -2,6 +2,7 @@ package com.portable.microservices.ms_tracking.picking.application.usecases;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -44,6 +45,12 @@ public class CrearOrdenPickUseCase implements CrearOrdenPickPortIn {
         }
 
         return ordenGuardada;
+    }
+
+    @Override
+    @Transactional
+    public Optional<OrdenPick> buscarPorDocRef(String docRef) {
+        return ordenPickPersistence.findByDocRef(docRef);
     }
     
 }

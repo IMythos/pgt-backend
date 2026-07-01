@@ -3,6 +3,7 @@ package com.portable.microservices.ms_inventory.movement.infrastructure.presenta
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,12 +29,14 @@ import com.portable.microservices.ms_inventory.movement.domain.ports.in.Register
 import com.portable.microservices.ms_inventory.movement.domain.ports.in.RegisterEntradaPortIn;
 import com.portable.microservices.ms_inventory.movement.domain.ports.in.RegisterMovementPortIn;
 import com.portable.microservices.ms_inventory.movement.domain.ports.in.RegisterMovementPortIn.RegisterMovementCommand;
+import com.portable.microservices.ms_inventory.movement.domain.ports.in.RegisterSalidaBatchPortIn;
 import com.portable.microservices.ms_inventory.movement.domain.ports.in.RegisterSalidaPortIn;
 import com.portable.microservices.ms_inventory.movement.infrastructure.persistence.repository.MovementJpaRepository;
 import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.dto.MovimientoListadoResponse;
 import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.dto.MovimientoResponse;
 import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.dto.RegisterAjustePositivoRequest;
 import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.dto.RegisterEntradaRequest;
+import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.dto.RegisterSalidaPickingRequest;
 import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.dto.RegisterSalidaRequest;
 import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.dto.RegistrarMovimientoRequest;
 import com.portable.microservices.ms_inventory.movement.infrastructure.presentation.mapper.MovimientoWebMapper;
@@ -53,6 +56,7 @@ public class MovimientoController {
 
         private final RegisterEntradaPortIn registerEntradaPortIn;
         private final RegisterSalidaPortIn registerSalidaPortIn;
+        private final RegisterSalidaBatchPortIn registerSalidaBatchUseCase;
         private final RegisterAjustePositivoPortIn registerAjustePositivoPortIn;
         private final ListMovementsPortIn listMovementsUseCase;
         private final FindMovementPortIn findMovementUseCase;
@@ -138,6 +142,26 @@ public class MovimientoController {
                 MovimientoResponse response = mapper.toResponse(movimiento);
                 return ResponseEntity.status(HttpStatus.CREATED)
                                 .body(ApiResponse.ok("Salida registrada exitosamente", response));
+        }
+
+        @PostMapping("/salida-picking")
+        public ResponseEntity<ApiResponse<List<UUID>>> registrarSalidaPicking(
+                        @Valid @RequestBody RegisterSalidaPickingRequest request) {
+                var auth = SecurityContextHolder.getContext().getAuthentication();
+                Long userId = auth != null && auth.getCredentials() instanceof Claims claims
+                                ? claims.get("userId", Long.class)
+                                : null;
+                if (userId == null)
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+                log.info("Registrando salida batch con {} items", request.items().size());
+                var items = request.items().stream()
+                                .map(i -> new RegisterSalidaBatchPortIn.SalidaBatchItem(i.idLote(), i.cantidad()))
+                                .toList();
+                List<UUID> movementIds = registerSalidaBatchUseCase.execute(items, request.motivo(),
+                                request.documentoRef(), userId);
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(ApiResponse.ok("Movimientos registrados exitosamente", movementIds));
         }
 
         @PostMapping("/ajuste-positivo")

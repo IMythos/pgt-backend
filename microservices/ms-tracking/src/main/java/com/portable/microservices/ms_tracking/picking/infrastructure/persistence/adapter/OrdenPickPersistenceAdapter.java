@@ -38,6 +38,11 @@ public class OrdenPickPersistenceAdapter implements OrdenPickPersistencePortOut 
     }
 
     @Override
+    public Optional<OrdenPick> findByDocRef(String docRef) {
+        return repository.findByDocRef(docRef).map(mapper::toDomain);
+    }
+
+    @Override
     public List<OrdenPick> findAll() {
         return repository.findAll().stream()
                 .map(mapper::toDomain)

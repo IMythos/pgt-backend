@@ -10,5 +10,7 @@ public record NodoGrafo(
         String zona,
         String pasillo,
         String estante,
-        String tipoNodo
+        String tipoNodo,
+        Integer posX,
+        Integer posY
 ) {}

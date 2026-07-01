@@ -32,6 +32,8 @@ public class UpdateLocationUseCase implements UpdateLocationPortIn {
             
             // Para números (Integer) solo comprobamos si es null
             .capacidad(location.capacidad() != null ? location.capacidad() : existing.capacidad())
+            .posX(location.posX() != null ? location.posX() : existing.posX())
+            .posY(location.posY() != null ? location.posY() : existing.posY())
             .build();
 
         return persistence.save(updated);

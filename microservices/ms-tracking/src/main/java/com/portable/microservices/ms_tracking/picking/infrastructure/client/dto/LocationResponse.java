@@ -13,5 +13,7 @@ public class LocationResponse {
     private String estante;
     private String codBarras;
     private Integer capacidad;
+    private Integer posX;
+    private Integer posY;
     private Boolean activo;
 }

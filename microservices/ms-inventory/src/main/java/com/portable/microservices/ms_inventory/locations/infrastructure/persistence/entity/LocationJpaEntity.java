@@ -28,5 +28,12 @@ public class LocationJpaEntity {
     private String codBarras;
 
     private Integer capacidad;
+
+    @Column(name = "pos_x")
+    private Integer posX;
+
+    @Column(name = "pos_y")
+    private Integer posY;
+
     private Boolean activo = true;
 }

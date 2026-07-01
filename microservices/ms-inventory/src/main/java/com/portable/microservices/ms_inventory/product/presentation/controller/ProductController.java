@@ -44,17 +44,20 @@ public class ProductController {
         System.out.println("TIPO DE DATO RECIBIDO: " + request.modelosCompatibles().getClass().getName());
         
         Product product = createProductUseCase.execute(
-                new CreateProductUseCase.CreateProductCommand(
-                        request.categoryId(),
-                        request.brandId(),
-                        request.codProd(),
-                        request.codAnexo(),
-                        request.descripcion(),
-                        request.modelosCompatibles(),
-                        request.preCom(),
-                        request.preVen(),
-                        request.stockMinimo(),
-                        request.stockInicial()));
+            new CreateProductUseCase.CreateProductCommand(
+                request.categoryId(),
+                request.brandId(),
+                request.codProd(),
+                request.codAnexo(),
+                request.descripcion(),
+                request.modelosCompatibles(),
+                request.preCom(),
+                request.preVen(),
+                request.stockMinimo(),
+                request.stockInicial(),
+                request.idLocacion() != null ? UUID.fromString(request.idLocacion()) : null
+            )
+        );
         return ResponseEntity.ok(presentationMapper.toResponse(product));
     }
 

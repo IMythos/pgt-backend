@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import com.portable.microservices.ms_inventory.kardex.domain.service.CostoPromed
 import com.portable.microservices.ms_inventory.locations.infrastructure.persistence.entity.LocationJpaEntity;
 import com.portable.microservices.ms_inventory.lot.infrastructure.persistence.entity.LoteJpaEntity;
 import com.portable.microservices.ms_inventory.lot.infrastructure.persistence.repository.LoteJpaRepository;
+import com.portable.microservices.ms_inventory.movement.domain.event.MovementCreatedEvent;
 import com.portable.microservices.ms_inventory.movement.domain.model.Movement;
 import com.portable.microservices.ms_inventory.movement.domain.model.TipoMovimiento;
 import com.portable.microservices.ms_inventory.movement.domain.ports.in.RegisterMovementPortIn;
@@ -31,6 +33,7 @@ public class RegisterMovementUseCase implements RegisterMovementPortIn {
     private final KardexPersistencePortOut kardexPersistence;
     private final CostoPromedioCalculator costoPromedioCalculator;
     private final LoteJpaRepository loteRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -86,12 +89,19 @@ public class RegisterMovementUseCase implements RegisterMovementPortIn {
             resolvedLotId = loteRepository.save(lote).getIdLote();
         }
 
+        UUID locacionFromDeduction = null;
+
         if ((tipo == TipoMovimiento.SALIDA || tipo == TipoMovimiento.AJUSTE_NEGATIVO) && command.productId() != null) {
             List<LoteJpaEntity> lots = loteRepository.findByProductoIdOrderByFecIngresoAsc(command.productId());
             int remaining = command.cantidad();
             for (LoteJpaEntity lot : lots) {
-                if (remaining <= 0) break;
-                if (lot.getCantidad() <= 0) continue;
+                if (remaining <= 0)
+                    break;
+                if (lot.getCantidad() <= 0)
+                    continue;
+                if (locacionFromDeduction == null && lot.getLocacion() != null) {
+                    locacionFromDeduction = lot.getLocacion().getIdLocacion();
+                }
                 int deduct = Math.min(remaining, lot.getCantidad());
                 lot.setCantidad(lot.getCantidad() - deduct);
                 if (lot.getCantidad() == 0) {
@@ -147,6 +157,21 @@ public class RegisterMovementUseCase implements RegisterMovementPortIn {
                     cantSalida,
                     resultado.stockActual(),
                     resultado.costoPromNuevo());
+            if (tipo == TipoMovimiento.SALIDA || tipo == TipoMovimiento.AJUSTE_NEGATIVO) {
+                UUID locacionId = locacionFromDeduction;
+                if (locacionId == null && resolvedLotId != null) {
+                    locacionId = loteRepository.findById(resolvedLotId)
+                            .map(l -> l.getLocacion() != null ? l.getLocacion().getIdLocacion() : null)
+                            .orElse(null);
+                }
+                eventPublisher.publishEvent(new MovementCreatedEvent(
+                        saved.id(),
+                        command.productId(),
+                        tipo.name(),
+                        locacionId,
+                        command.cantidad(),
+                        command.userId()));
+            }
             kardexPersistence.save(kardex);
         }
     }

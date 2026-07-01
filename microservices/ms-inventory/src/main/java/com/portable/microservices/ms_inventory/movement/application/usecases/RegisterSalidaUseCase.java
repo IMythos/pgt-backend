@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.portable.microservices.ms_inventory.kardex.infrastructure.persistence.entity.KardexJpaEntity;
 import com.portable.microservices.ms_inventory.lot.infrastructure.persistence.entity.LoteJpaEntity;
 import com.portable.microservices.ms_inventory.movement.domain.model.Movimiento;
+import com.portable.microservices.ms_inventory.movement.domain.event.MovementCreatedEvent;
 import com.portable.microservices.ms_inventory.movement.domain.ports.in.RegisterSalidaPortIn;
 import com.portable.microservices.ms_inventory.movement.domain.ports.out.KardexPersistencePortOut;
 import com.portable.microservices.ms_inventory.movement.domain.ports.out.LotePersistencePortOut;
@@ -104,6 +105,16 @@ public class RegisterSalidaUseCase implements RegisterSalidaPortIn {
                         "Stock insuficiente en lotes. Faltan " + remaining + " unidades");
             }
         }
+
+        UUID locacionId = lote.getLocacion() != null ? lote.getLocacion().getIdLocacion() : null;
+        eventPublisher.publishEvent(new MovementCreatedEvent(
+                movimientoGuardado.idMovimiento(),
+                idProducto,
+                movimientoGuardado.tipo(),
+                locacionId,
+                movimientoGuardado.cantidad(),
+                idUsuario
+        ));
 
         Integer nuevoStock = stockDisponible - cantidad;
         eventPublisher.publishEvent(new StockDecreasedEvent(idProducto, nuevoStock));

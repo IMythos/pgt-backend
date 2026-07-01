@@ -7,5 +7,6 @@ public record MovementCreatedEvent(
     UUID productId,
     String tipoMovimiento,
     UUID locacionId,
-    Integer cantidad
+    Integer cantidad,
+    Long userId
 ) {}

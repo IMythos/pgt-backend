@@ -13,6 +13,8 @@ public record Location(
     String estante,
     String codBarras,
     Integer capacidad,
+    Integer posX,
+    Integer posY,
     Boolean activo
 ) {
     public boolean isValidForCreation() {

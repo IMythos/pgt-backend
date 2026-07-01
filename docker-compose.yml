@@ -227,6 +227,7 @@ services:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/db_portable?currentSchema=tracking"
       SPRING_DATASOURCE_USERNAME: "postgres"
       SPRING_DATASOURCE_PASSWORD: "admin"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
       SPRING_RABBITMQ_HOST: "rabbitmq"
       SPRING_RABBITMQ_PORT: "5672"
       SPRING_RABBITMQ_USERNAME: "guest"

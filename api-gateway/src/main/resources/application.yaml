@@ -90,6 +90,11 @@ spring:
           predicates:
             - Path=/ws/**
 
+        - id: ms-tracking-picking
+          uri: lb://ms-tracking
+          predicates:
+            - Path=/api/v1/picking/**
+
 eureka:
   client:
     service-url:

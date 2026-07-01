@@ -39,6 +39,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/api/v1/locations",
             "/api/v1/dashboard",
             "/api/v1/heatmap",
+            "/api/v1/picking",
             "/ws"
         );
 

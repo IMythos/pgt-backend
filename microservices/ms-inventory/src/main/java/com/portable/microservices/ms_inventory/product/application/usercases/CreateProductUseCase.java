@@ -53,7 +53,7 @@ public class CreateProductUseCase implements CreateProductPortIn {
             registerIngresoUseCase.execute(
                 new RegisterIngresoPortIn.RegisterIngresoCommand(
                     guardado.id(),
-                    null,
+                    command.idLocacion(),
                     "INICIAL",
                     null,
                     costoUnit,

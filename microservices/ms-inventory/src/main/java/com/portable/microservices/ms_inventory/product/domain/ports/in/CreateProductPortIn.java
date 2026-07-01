@@ -4,6 +4,7 @@ import com.portable.microservices.ms_inventory.product.domain.model.Product;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface CreateProductPortIn {
     Product execute(CreateProductCommand command);
@@ -18,6 +19,7 @@ public interface CreateProductPortIn {
         BigDecimal pre_com,
         BigDecimal pre_ven,
         Integer stock_minimo,
-        Integer stock_inicial
+        Integer stock_inicial,
+        UUID idLocacion
     ) {}
 }

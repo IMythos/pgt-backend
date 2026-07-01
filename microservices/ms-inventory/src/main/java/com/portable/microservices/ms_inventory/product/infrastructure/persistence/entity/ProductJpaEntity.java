@@ -3,9 +3,12 @@ package com.portable.microservices.ms_inventory.product.infrastructure.persisten
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
@@ -68,9 +71,9 @@ public class ProductJpaEntity {
     @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
-    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "modelos_compatibles", columnDefinition = "jsonb")
-    private List<String> modelos_compatibles;
+    private Map<String, Object> modelos_compatibles;
 
     @Column(name = "pre_com", precision = 12, scale = 4, nullable = false)
     private BigDecimal pre_com;

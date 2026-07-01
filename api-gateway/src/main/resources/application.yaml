@@ -13,9 +13,7 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins:
-              - "http://localhost:4200"
-              - "https://pgt-frontend.pages.dev"
+            allowedOrigins: "*"
             allowedMethods:
               - GET
               - POST

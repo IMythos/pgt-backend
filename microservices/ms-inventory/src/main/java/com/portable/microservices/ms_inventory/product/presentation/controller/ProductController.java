@@ -41,6 +41,8 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest request) {
+        System.out.println("TIPO DE DATO RECIBIDO: " + request.modelosCompatibles().getClass().getName());
+        
         Product product = createProductUseCase.execute(
             new CreateProductUseCase.CreateProductCommand(
                 request.categoryId(),
@@ -60,18 +62,18 @@ public class ProductController {
     }
 
     @GetMapping
-public ResponseEntity<PagedResponse<ProductResponse>> findAll(
-        @RequestParam(required = false) String texto,
-        @RequestParam(required = false) Long idCategoria,
-        @RequestParam(required = false) Boolean estado,
-        @RequestParam(defaultValue = "0") int pagina,
-        @RequestParam(defaultValue = "50") int tamanioPagina) {
-    PagedResponse<Product> page = findProductUseCase.findAll(texto, idCategoria, estado, pagina, tamanioPagina);
-    List<ProductResponse> items = page.items().stream()
-            .map(presentationMapper::toResponse)
-            .toList();
-    return ResponseEntity.ok(new PagedResponse<>(items, page.total(), page.page(), page.pageSize()));
-}
+    public ResponseEntity<PagedResponse<ProductResponse>> findAll(
+            @RequestParam(required = false) String texto,
+            @RequestParam(required = false) Long idCategoria,
+            @RequestParam(required = false) Boolean estado,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "50") int tamanioPagina) {
+        PagedResponse<Product> page = findProductUseCase.findAll(texto, idCategoria, estado, pagina, tamanioPagina);
+        List<ProductResponse> items = page.items().stream()
+                .map(presentationMapper::toResponse)
+                .toList();
+        return ResponseEntity.ok(new PagedResponse<>(items, page.total(), page.page(), page.pageSize()));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> findById(@PathVariable UUID id) {
@@ -82,7 +84,7 @@ public ResponseEntity<PagedResponse<ProductResponse>> findAll(
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponse> update(@PathVariable UUID id,
-                                                  @RequestBody UpdateProductUseCase.UpdateProductCommand command) {
+            @RequestBody UpdateProductUseCase.UpdateProductCommand command) {
         Product updated = updateProductUseCase.execute(id, command);
         return ResponseEntity.ok(presentationMapper.toResponse(updated));
     }
@@ -97,26 +99,27 @@ public ResponseEntity<PagedResponse<ProductResponse>> findAll(
     public ResponseEntity<Long> count() {
         return ResponseEntity.ok(findProductUseCase.count());
     }
+
     @GetMapping("/export")
-public ResponseEntity<Resource> exportToExcel(@RequestParam(defaultValue = "EXCEL") String format) {
-    ExportFormat exportFormat;
-    try {
-        exportFormat = ExportFormat.valueOf(format.toUpperCase());
-    } catch (IllegalArgumentException e) {
-        exportFormat = ExportFormat.EXCEL;
+    public ResponseEntity<Resource> exportToExcel(@RequestParam(defaultValue = "EXCEL") String format) {
+        ExportFormat exportFormat;
+        try {
+            exportFormat = ExportFormat.valueOf(format.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            exportFormat = ExportFormat.EXCEL;
+        }
+        Resource resource = exportProductUseCase.exportToFormat(exportFormat);
+        String fecha = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        String extension = exportFormat == ExportFormat.PDF ? "pdf" : "xlsx";
+        String filename = "inventario-productos-" + fecha + "." + extension;
+
+        String mediaType = exportFormat == ExportFormat.PDF
+                ? "application/pdf"
+                : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType(mediaType))
+                .body(resource);
     }
-    Resource resource = exportProductUseCase.exportToFormat(exportFormat);
-    String fecha = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-    String extension = exportFormat == ExportFormat.PDF ? "pdf" : "xlsx";
-    String filename = "inventario-productos-" + fecha + "." + extension;
-    
-    String mediaType = exportFormat == ExportFormat.PDF 
-        ? "application/pdf" 
-        : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    
-    return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-        .contentType(MediaType.parseMediaType(mediaType))
-        .body(resource);
-}
 }

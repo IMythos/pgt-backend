@@ -1,6 +1,8 @@
 package com.portable.microservices.ms_tracking.picking.application.usecases;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -76,31 +78,51 @@ public class OptimizarRutaUseCase implements OptimizarRutaPortIn {
                     "Ninguna locación a recoger encontrada en el inventario. Locaciones solicitadas: "
                             + locacionesRecoger);
         }
-        if (warehouseIds.size() > 1) {
-            throw new IllegalArgumentException(
-                    "Las locaciones de la orden pertenecen a múltiples almacenes: " + warehouseIds);
+
+        log.debug("Paso 4-5/5: Optimizando por cada almacén ({} almacén(es))...", warehouseIds.size());
+        List<UUID> combinedPath = new ArrayList<>();
+        BigDecimal totalDistance = BigDecimal.ZERO;
+
+        for (int i = 0; i < warehouseIds.size(); i++) {
+            Long whId = warehouseIds.get(i);
+            log.debug("Procesando almacén {}/{}: whId={}", i + 1, warehouseIds.size(), whId);
+
+            List<LocationResponse> locationsInWh = allLocations.stream()
+                    .filter(loc -> whId.equals(loc.getIdAlmacen()))
+                    .toList();
+
+            List<UUID> pickLocationsInWh = locacionesRecoger.stream()
+                    .filter(locId -> allLocations.stream()
+                            .anyMatch(l -> l.getIdLocacion().equals(locId) && whId.equals(l.getIdAlmacen())))
+                    .toList();
+
+            log.debug("Construyendo grafo con {} locations del whId={}...", locationsInWh.size(), whId);
+            var grafo = constructorGrafo.construirGrafo(locationsInWh, null);
+            log.debug("Grafo construido: {} nodos, {} aristas", grafo.nodos().size(), grafo.aristas().size());
+
+            log.debug("Ejecutando Dijkstra para {} locaciones en whId={}...", pickLocationsInWh.size(), whId);
+            var rutaOptima = optimizador.optimizar(grafo, pickLocationsInWh);
+            log.info("Ruta para almacén {}: distancia={}, pathLength={}",
+                    whId, rutaOptima.distanciaTotal(), rutaOptima.pathCompleto().size());
+
+            List<UUID> segmentPath = rutaOptima.pathCompleto();
+            int segSize = segmentPath.size();
+
+            if (i == 0) {
+                combinedPath.addAll(segmentPath.subList(0, segSize - 1));
+            } else {
+                combinedPath.addAll(segmentPath.subList(1, segSize - 1));
+            }
+            totalDistance = totalDistance.add(rutaOptima.distanciaTotal());
         }
-        Long warehouseId = warehouseIds.get(0);
-        log.debug("Almacén ID único: {}", warehouseId);
+        combinedPath.add(ConstructorGrafoService.SALIDA_ID);
 
-        List<LocationResponse> locationsInWarehouse = allLocations.stream()
-                .filter(loc -> warehouseId.equals(loc.getIdAlmacen()))
-                .toList();
-
-        log.debug("Paso 4/5: Construyendo grafo con {} locations del warehouseId={}...", locationsInWarehouse.size(), warehouseId);
-        var grafo = constructorGrafo.construirGrafo(locationsInWarehouse, null);
-        log.debug("Grafo construido: {} nodos, {} aristas", grafo.nodos().size(), grafo.aristas().size());
-
-        log.debug("Paso 5/5: Ejecutando optimizador Dijkstra para {} locaciones...", locacionesRecoger.size());
-        var rutaOptima = optimizador.optimizar(grafo, locacionesRecoger);
-        log.info("Ruta óptima calculada: distancia={}, pathLength={}", 
-                rutaOptima.distanciaTotal(), rutaOptima.pathCompleto().size());
-
+        log.info("Ruta multi-almacén combinada: distancia={}, pathLength={}", totalDistance, combinedPath.size());
         var ruta = RutaPick.builder()
                 .idRuta(UUID.randomUUID())
                 .idOrden(idOrden)
-                .pathSeq(rutaOptima.pathCompleto())
-                .distanciaEstimada(rutaOptima.distanciaTotal())
+                .pathSeq(combinedPath)
+                .distanciaEstimada(totalDistance)
                 .fecCreacion(OffsetDateTime.now())
                 .build();
 

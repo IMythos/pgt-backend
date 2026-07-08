@@ -3,7 +3,6 @@ package com.portable.microservices.ms_inventory.product.domain.model;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public record Product(
@@ -13,7 +12,7 @@ public record Product(
     String codProd,
     String codAnexo,
     String descripcion,
-    Map<String, Object> modelosCompatibles,
+    List<String> modelosCompatibles,
     BigDecimal preCom,
     BigDecimal preVen,
     boolean estado,

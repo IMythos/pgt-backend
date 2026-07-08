@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: discovery-server-test
+  config:
+    import: "optional:configserver:${TEST_CONFIG_SERVER_URL:http://localhost:8888}"
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+server:
+  port: 0
+
+logging:
+  level:
+    root: INFO

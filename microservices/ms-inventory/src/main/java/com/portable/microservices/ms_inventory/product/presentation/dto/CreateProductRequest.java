@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 public record CreateProductRequest(
     @NotNull Long categoryId,
@@ -13,7 +12,7 @@ public record CreateProductRequest(
     @NotBlank @Size(max = 30) String codProd,
     @Size(max = 30) String codAnexo,
     @NotBlank String descripcion,
-    Map<String, Object> modelosCompatibles,
+    List<String> modelosCompatibles,
     @NotNull BigDecimal preCom,
     @NotNull BigDecimal preVen,
     Integer stockMinimo,

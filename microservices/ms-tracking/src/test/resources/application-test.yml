@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: ms-tracking-test
+  config:
+    import: "optional:configserver:${TEST_CONFIG_SERVER_URL:http://localhost:8888}"
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/db_portable?currentSchema=tracking}
+    username: ${TEST_DB_USERNAME:postgres}
+    password: ${TEST_DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: tracking
+  rabbitmq:
+    host: ${TEST_RABBITMQ_HOST:localhost}
+    port: ${TEST_RABBITMQ_PORT:5672}
+    username: ${TEST_RABBITMQ_USERNAME:guest}
+    password: ${TEST_RABBITMQ_PASSWORD:}
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    root: INFO

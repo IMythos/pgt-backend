@@ -20,13 +20,14 @@ public class ConstructorGrafoService {
     public GrafoAlmacen construirGrafo(List<LocationResponse> locaciones, NodoGrafo nodoEntradaOmitido) {
         List<NodoGrafo> todosLosNodos = new ArrayList<>();
         
+        // 1. Mapear los estantes reales
         for (LocationResponse loc : locaciones) {
             todosLosNodos.add(NodoGrafo.builder()
                     .idNodo(loc.getIdLocacion())
                     .zona(loc.getZona())
                     .pasillo(loc.getPasillo())
                     .estante(loc.getEstante())
-                    .tipoNodo("RACK")
+                    .tipoNodo("RACK") // Importante para diferenciar
                     .posX(loc.getPosX()) 
                     .posY(loc.getPosY()) 
                     .build());

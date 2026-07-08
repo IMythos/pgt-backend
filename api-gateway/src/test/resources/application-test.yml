@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: api-gateway-test
+  config:
+    import: "optional:configserver:${TEST_CONFIG_SERVER_URL:http://localhost:8888}"
+  cloud:
+    config:
+      enabled: false
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    root: INFO

@@ -21,6 +21,7 @@ public class OptimizadorRutaService {
     public RutaOptima optimizar(GrafoAlmacen grafo, List<UUID> locacionesRecoger) {
         if (locacionesRecoger.isEmpty()) {
             return new RutaOptima(List.of(), BigDecimal.ZERO);
+
         }
         UUID entrada = grafo.nodos().stream()
                 .filter(n -> "Entrada".equals(n.tipoNodo()))

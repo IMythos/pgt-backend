@@ -3,6 +3,7 @@ package com.portable.microservices.ms_inventory.product.domain.ports.in;
 import com.portable.microservices.ms_inventory.product.domain.model.Product;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface CreateProductPortIn {
@@ -14,7 +15,7 @@ public interface CreateProductPortIn {
         String cod_prod,
         String cod_anexo,
         String descripcion,
-        List<String> modelos_compatibles,
+        Map<String, Object> modelos_compatibles,
         BigDecimal pre_com,
         BigDecimal pre_ven,
         Integer stock_minimo,
